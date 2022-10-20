@@ -1,6 +1,9 @@
 const sharp = require('sharp');
 const _ = require('lodash');
+const { goodCondition } = require('./test/specs/levelup');
 sharp.cache(false);
+
+const debug = false;
 
 
 let levelUpPanelColors = [  // find max color in image
@@ -39,6 +42,26 @@ const checkIsLevelUp = async (newImage) => {
   return percentage >= 0.007; // examinate existing image
 }
 
+// real
+// [260, ]
+// [220, 30]
+
+// stat
+// const panelStart = [145, 290];
+// const panelStop = [930, 750];
+
+
+// avd
+const panelStart = [140, 227];
+const panelStop = [920, 657];
+
+
+// stat
+const statBegin = [420, 270];
+const stat2Begin = [700]
+const statSize = [200, 30]
+const statHeight = 40;
+
 const findTotalStatIncrease = async (newImage, start) => {
   let increase = {
     1: 0,
@@ -55,12 +78,16 @@ const findTotalStatIncrease = async (newImage, start) => {
       continue
     }
     const statImage = await newImage.clone().extract({
-      left: 260,
-      top: 55 + i * 40,
-      width: 220,
-      height: 30,
+      left: statBegin[0] - panelStart[0],
+      top: statBegin[1] + i * statHeight - panelStart[1],
+      width: statSize[0],
+      height: statSize[1],
     })
-    // await statImage.toFormat('jpg').toFile(`xxx1-${i}.jpg`)
+    
+    if (debug) {
+      await statImage.toFormat('jpg').toFile(`xxx1-${i}.jpg`)
+    }
+
     if (await hasIncrease(statImage)) {
       increase[i + 1] = 1;
     }
@@ -70,13 +97,15 @@ const findTotalStatIncrease = async (newImage, start) => {
       continue
     }
     const statImage = await newImage.clone().extract({
-      left: 526,
-      top: 55 + i * 40,
-      width: 250,
-      height: 30,
+      left: stat2Begin[0] - panelStart[0],
+      top: statBegin[1] + i * statHeight - panelStart[1],
+      width: statSize[0],
+      height: statSize[1],
     });
 
-    // await statImage.toFormat('jpg').toFile(`xxx2-${i}.jpg`)
+    if (debug) {
+      await statImage.toFormat('jpg').toFile(`xxx2-${i}.jpg`)
+    }
 
     if (await hasIncrease(statImage)) {
       increase[i + 6] = 1;
@@ -99,14 +128,18 @@ const checkIsGoodLevelUpImg = async (i, startStat) => {
   const image = sharp(`level-up-${i}.png`);
   
   const newImage = image.extract({
-    left: 145,
-    top: 290,
-    width: 930 - 145,
-    height: 750 - 290,
+    left: panelStart[0],
+    top: panelStart[1],
+    width: panelStop[0] - panelStart[0],
+    height: panelStop[1] - panelStart[1],
   });
+
+  if (debug) {
+    await newImage.toFormat('jpg').toFile(`crop-level-up-${i}.jpg`)
+  }
   const isLevelUp = await checkIsLevelUp(newImage);
   if (isLevelUp) {
-    const totalStatIncrease = await findTotalStatIncrease(newImage, startStat);
+    const totalStatIncrease = await findTotalStatIncrease(image, startStat);
     return totalStatIncrease;
   }
 }
@@ -184,6 +217,10 @@ const checkGoodCondition = (isGood, required) => {
 
 module.exports = { checkIsGoodLevelUp, statSummary, checkGoodCondition, checkIsLevelUp }
 
-const debug = async () => {
-  console.log(await checkIsGoodLevelUp(5));
+if (debug) {
+  const func = async () => {
+    console.log(await checkIsGoodLevelUp(7, goodCondition));
+  }
+  func();
 }
+

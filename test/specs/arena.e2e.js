@@ -18,13 +18,37 @@ describe('Run auto', () => {
 
   it('level up', async () => {
     let steps = `
-    ${forceRandom}
-    O
     X
+    O
+    O
+    wait
+    wait
+    wait
+    wait
+    O
+    wait
+    wait
+    wait
+    O
+    O
+    O
+    O
+    O
+    O
+    O
+    O
     save
-    ${fight}
-    confirm
-    ${isBoss ? 'boss' : 'finish'}
+    right
+    O
+    O
+    O
+    O
+    O
+    O
+    O
+    O
+    O
+    wait-level-up
   `;
     steps = steps.split('\n').map((x) => {
       x = x.trim();
