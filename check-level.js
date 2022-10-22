@@ -1,8 +1,9 @@
 const sharp = require('sharp');
 const _ = require('lodash');
 const fs = require('fs');
+const { exec } = require("child_process");
 
-const { goodCondition } = require('./test/specs/levelup');
+const { goodCondition, syncGithub } = require('./test/specs/levelup');
 const { sleep } = require('./test/specs/common');
 sharp.cache(false);
 
@@ -237,7 +238,18 @@ const checkLevelUpgrade = async (required) => {
     await sleep(400);
     await driver.saveScreenshot(`level-up-${i}.png`);
   }
-  return await checkIsGoodLevelUp(total, required);
+  const good = await checkIsGoodLevelUp(total, required);
+  if (good && syncGithub) {
+    exec('adb -s emulator-5554 pull storage/self/primary/duckstation/savestates/SLPS-03177_0.sav', (err1, stdout, stderr) => {
+      exec('git add .', (err1, stdout, stderr) => {
+        exec('git cm -m "update save file"', (err1, stdout, stderr) => {
+          exec('git push', (err1, stdout, stderr) => {
+          })
+        })
+      })
+    });
+  }
+  return good;
 }
 
 
