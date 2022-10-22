@@ -21,6 +21,7 @@ const findColor = (color, colors) => {
 const colorSampleFile = fs.readFileSync('sample-color.json');
 let sampleColors = JSON.parse(colorSampleFile);
 sampleColors = sampleColors.map((x) => parseInt(x, 10));
+const totalStat = 9;
 
 
 const checkIsLevelUp = async (newImage) => {
@@ -68,6 +69,7 @@ const findTotalStatIncrease = async (newImage, start) => {
     6: 0,
     7: 0,
     8: 0,
+    9: 0,
   }
   for (let i = 0; i < 5; i++) {
     if (i + 1 <= start) {
@@ -154,17 +156,17 @@ const getStatIncreased = async (total) => {
     if (!findIncreased) {
       continue;
     }
-    for (let k = lastStatIncreased + 1; k <= 8; k++) {
+    for (let k = lastStatIncreased + 1; k <= totalStat; k++) {
       if (findIncreased[k]) {
         increased[k] = 1;
         lastStatIncreased = k;
       }
     }
-    if (lastStatIncreased === 8) {
+    if (lastStatIncreased === totalStat) {
       break;
     }
   }
-  for (let k = 1; k <= 8; k++) {
+  for (let k = 1; k <= totalStat; k++) {
     if (increased[k]) {
       increased.count += 1;
     }
@@ -195,8 +197,11 @@ const statName = {
 }
 
 const statSummary = (stats) => {
+  if (debug) {
+    console.log({stats})
+  }
   const summary = [stats.count];
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= totalStat; i++) {
     if(stats[i]) {
       summary.push(statName[i])
     }
@@ -221,9 +226,10 @@ const isGoodCondition = (isGood, required) => {
 }
 
 const checkGoodCondition = (isGood, required) => {
-  if (Array.isArray(isGood)) {
-    for (let i = 0; i < isGood.length; i++) {
-      if (isGoodCondition(isGood[i], required)) {
+  if (Array.isArray(required)) {
+    
+    for (let i = 0; i < required.length; i++) {
+      if (isGoodCondition(isGood, required[i])) {
         return true;
       }
     }
@@ -256,17 +262,10 @@ const checkLevelUpgrade = async (required) => {
 module.exports = { checkIsGoodLevelUp, statSummary, checkGoodCondition, checkIsLevelUp, findColor, extractLevelUpPanel, checkLevelUpgrade }
 
 const func = async () => {
-  console.log(checkGoodCondition({
-    count: 5,
-    2: 1,
-    3: 1,
-    4: 0,
-    5: 1,
-    6: 0,
-    7: 1,
-    8: 1,
-    9: 0,
-  }, goodCondition));
+  const good = await checkIsGoodLevelUp(7, goodCondition);
+  console.log({good})
 }
-func();
+if (debug) {
+  func();
+}
 
