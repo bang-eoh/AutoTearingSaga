@@ -1,7 +1,8 @@
-const { checkIsLevelUp } = require('../../check-level');
+const { checkIsLevelUp, extractLevelUpPanel } = require('../../check-level');
 const { sleep } = require('../specs/common');
 const sharp = require('sharp')
 const Page = require('./page');
+sharp.cache(false);
 
 
 /**
@@ -131,22 +132,16 @@ class PlayingPage extends Page {
   }
 
   async takePic (num) {
-    await driver.saveScreenshot(`level-up-${num}.png`);
+    await driver.saveScreenshot(`current.png`);
     await sleep(400);
   }
 
   async waitLevelUp() {
     for (let i = 0; i < 30; i++) {
       await driver.saveScreenshot(`current.png`);
-      const image = sharp(`level-up-${i}.png`);
-  
-      const newImage = image.extract({
-        left: 145,
-        top: 290,
-        width: 930 - 145,
-        height: 750 - 290,
-      });
-      if (checkIsLevelUp(newImage)) {
+      const image = sharp(`current.png`);
+      const cropImage = await extractLevelUpPanel(image);
+      if (await checkIsLevelUp(cropImage)) {
         return;
       }
       await sleep(1000)
@@ -155,78 +150,84 @@ class PlayingPage extends Page {
  
   async perform(step) {
     const parts = step.split(' ');
-    switch (parts[0]) {
-      case 'left':
-        await this.moveLeft();
-        await sleep(300);
-        break;
-      case 'right':
-        await this.moveRight();
-        await sleep(300);
-        break;
-      case 'up':
-        await this.moveUp();
-        await sleep(300);
-        break;
-      case 'down':
-        await this.moveDown();
-        await sleep(300);
-        break;
-      case 'X':
-        await this.pressX();
-        await sleep(1000);
-        break;
-      case 'O':
-        await this.pressO();
-        await sleep(1000);
-        break;
-      case 'square':
-        await this.pressSquare();
-        await sleep(500);
-        break;
-      case 'triangle':
-        await this.pressTriangle();
-        await sleep(500);
-        break;
-      case 'save':
-        await this.quicksave()
-        await sleep(1000);
-        break;
-      case 'up-left':
-        await this.moveUpLeft();
-        await sleep(300);
-        break;
-      case 'up-right':
-        await this.moveUpRight();
-        await sleep(300);
-        break;
-      case 'down-left':
-        await this.moveDownLeft();
-        await sleep(300);
-        break;
-      case 'down-right':
-        await this.moveDownRight();
-        await sleep(300);
-        break;
-      case 'confirm':
-        await this.spamO();
-        break;
-      case 'boss':
-        await this.finishBoss();
-        break;
-      case 'finish':
-        await this.finish();
-        break;
-      case 'wait':
-        await sleep(1000);
-        break;
-      case 'pic':
-        await this.takePic(parts[1]);
-        break
-      case 'wait-level-up':
-        await this.waitLevelUp();
-      default:
-        break;
+    let count = 1;
+    if (parts[1]) {
+      count = parseInt(parts[1], 10);
+    }
+    for (let i = 0; i < count; i++) {
+      switch (parts[0]) {
+        case 'left':
+          await this.moveLeft();
+          await sleep(300);
+          break;
+        case 'right':
+          await this.moveRight();
+          await sleep(300);
+          break;
+        case 'up':
+          await this.moveUp();
+          await sleep(300);
+          break;
+        case 'down':
+          await this.moveDown();
+          await sleep(300);
+          break;
+        case 'X':
+          await this.pressX();
+          await sleep(1000);
+          break;
+        case 'O':
+          await this.pressO();
+          await sleep(1000);
+          break;
+        case 'square':
+          await this.pressSquare();
+          await sleep(500);
+          break;
+        case 'triangle':
+          await this.pressTriangle();
+          await sleep(500);
+          break;
+        case 'save':
+          await this.quicksave()
+          await sleep(1000);
+          break;
+        case 'up-left':
+          await this.moveUpLeft();
+          await sleep(300);
+          break;
+        case 'up-right':
+          await this.moveUpRight();
+          await sleep(300);
+          break;
+        case 'down-left':
+          await this.moveDownLeft();
+          await sleep(300);
+          break;
+        case 'down-right':
+          await this.moveDownRight();
+          await sleep(300);
+          break;
+        case 'confirm':
+          await this.spamO();
+          break;
+        case 'boss':
+          await this.finishBoss();
+          break;
+        case 'finish':
+          await this.finish();
+          break;
+        case 'wait':
+          await sleep(1000);
+          break;
+        case 'pic':
+          await this.takePic();
+          break
+        case 'wait-level-up':
+          await this.waitLevelUp();
+        default:
+          break;
+      }
     }
   }
 }

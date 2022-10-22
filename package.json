@@ -12,6 +12,9 @@
         "@wdio/cli": "^7.25.1"
     },
     "scripts": {
-        "wdio": "wdio run wdio.conf.js"
+        "wdio": "wdio run wdio.conf.js",
+        "run4": "((npx wdio --spec test/specs/levelup.e2e.js > /dev/null || npx wdio --spec test/specs/levelup.e2e.js > /dev/null || npx wdio --spec test/specs/levelup.e2e.js > /dev/null || npx wdio --spec test/specs/levelup.e2e.js > /dev/null) && play ~/Downloads/happy.mp3 -q repeat 1) || play ~/Downloads/sad.mp3 -q repeat 1",
+        "level": "(npx wdio --spec test/specs/levelup.e2e.js > /dev/null && play ~/Downloads/happy.mp3 -q repeat 1) || play ~/Downloads/sad.mp3 -q repeat 1",
+        "arena": "(npx wdio --spec test/specs/arena.e2e.js > /dev/null && play ~/Downloads/happy.mp3 -q repeat 1) || play ~/Downloads/sad.mp3 -q repeat 1"
     }
 }

@@ -1,16 +1,8 @@
-const { checkIsGoodLevelUp} = require('../../check-level');
+const { checkLevelUpgrade} = require('../../check-level');
 const PlayingPage = require('../pageobjects/playing.page');
 const { sleep } = require('./common');
 const { forceRandom, fight, isBoss, goodCondition } = require('./levelup');
 
-const checkLevelUpgrade = async (required) => {
-  const total = 7;
-  for (let i = 1; i <= total; i++) {
-    await sleep(400);
-    await driver.saveScreenshot(`level-up-${i}.png`);
-  }
-  return await checkIsGoodLevelUp(total, required);
-}
 
 describe('Run auto', () => {
   beforeAll(async () => {

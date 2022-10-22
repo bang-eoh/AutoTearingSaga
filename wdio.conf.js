@@ -56,7 +56,7 @@ exports.config = {
         appiumVersion: '1.22.3',
         platformName: 'Android',
         platformVersion: '12',
-        deviceName: 'emulator-5554', // 'R3CN203BDKN',
+        udid: 'emulator-5554', // 'R3CN203BDKN',
         automationName: 'UiAutomator2',
         autoGrantPermissions: 'true',
         appPackage: 'com.github.stenzek.duckstation',

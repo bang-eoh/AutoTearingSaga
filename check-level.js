@@ -1,23 +1,12 @@
 const sharp = require('sharp');
 const _ = require('lodash');
+const fs = require('fs');
+
 const { goodCondition } = require('./test/specs/levelup');
+const { sleep } = require('./test/specs/common');
 sharp.cache(false);
 
 const debug = false;
-
-
-let levelUpPanelColors = [  // find max color in image
-  [247, 247, 214],
-  [255, 255, 222],
-  [132, 115, 82],
-  [214, 197, 140],
-  [255, 247, 222],
-  [238, 222, 173],
-  [254, 254, 221],
-  [238, 247, 206],
-  [206, 189, 140],
-  [239, 247, 207]
-]
 
 const findColor = (color, colors) => {
   for (let i = 0; i < colors.length; i++) {
@@ -28,18 +17,24 @@ const findColor = (color, colors) => {
   return false;
 }
 
+const colorSampleFile = fs.readFileSync('sample-color.json');
+let sampleColors = JSON.parse(colorSampleFile);
+sampleColors = sampleColors.map((x) => parseInt(x, 10));
+
+
 const checkIsLevelUp = async (newImage) => {
-  newImage = await newImage.raw().toBuffer({ resolveWithObject: true });
+  newImage = await newImage.clone().greyscale().raw().toBuffer();
+  // console.log(colors);
   let count = 0;
   // r g b s
-  for (let j = 0; j < newImage.data.length; j += 4) {
-    const color = [newImage.data[j], newImage.data[j + 1], newImage.data[j + 2]];
-    if (findColor(color, levelUpPanelColors)) {
+  for (let j = 0; j < newImage.length; j++) {
+    const color = newImage[j];
+    if (sampleColors.includes(color)) {
       count += 1;
     }
   }
-  const percentage = count / (newImage.data.length / 4);
-  return percentage >= 0.007; // examinate existing image
+  const percentage = count / newImage.length;
+  return percentage >= 0.5; // examinate existing image
 }
 
 // real
@@ -92,7 +87,7 @@ const findTotalStatIncrease = async (newImage, start) => {
       increase[i + 1] = 1;
     }
   }
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 4; i++) {
     if (i + 6 <= start) {
       continue
     }
@@ -124,15 +119,20 @@ const hasIncrease = async (image) => {
   }
 }
 
-const checkIsGoodLevelUpImg = async (i, startStat) => {
-  const image = sharp(`level-up-${i}.png`);
-  
-  const newImage = image.extract({
+
+const extractLevelUpPanel = async (image) => {
+  return image.extract({
     left: panelStart[0],
     top: panelStart[1],
     width: panelStop[0] - panelStart[0],
     height: panelStop[1] - panelStart[1],
   });
+}
+
+const checkIsGoodLevelUpImg = async (i, startStat) => {
+  const image = sharp(`level-up-${i}.png`);
+  
+  const newImage = await extractLevelUpPanel(image);
 
   if (debug) {
     await newImage.toFormat('jpg').toFile(`crop-level-up-${i}.jpg`)
@@ -189,6 +189,8 @@ const statName = {
   6: 'magic',
   7: 'mastery',
   8: 'hp',
+  9: 'move',
+  count: 'Count',
 }
 
 const statSummary = (stats) => {
@@ -201,26 +203,58 @@ const statSummary = (stats) => {
   return summary;
 }
 
-const checkGoodCondition = (isGood, required) => {
-  if (isGood.count > required.count) {  // more than expect
+const isGoodCondition = (isGood, required) => {
+  if (required.count && isGood.count > required.count) {  // more than expect
     return true;
+  }
+  if (isGood.count < required.count) {
+    return false;
   }
 
   for (const k in required) { // equal expect
-    if (isGood[k] < required[k]) {
+    if (required[k] && !isGood[k]) {
       return false;
     }
   }
   return true;
 }
 
-
-module.exports = { checkIsGoodLevelUp, statSummary, checkGoodCondition, checkIsLevelUp }
-
-if (debug) {
-  const func = async () => {
-    console.log(await checkIsGoodLevelUp(7, goodCondition));
+const checkGoodCondition = (isGood, required) => {
+  if (Array.isArray(isGood)) {
+    for (let i = 0; i < isGood.length; i++) {
+      if (isGoodCondition(isGood[i], required)) {
+        return true;
+      }
+    }
+    return false;
   }
-  func();
+  return isGoodCondition(isGood, required);
 }
+
+const checkLevelUpgrade = async (required) => {
+  const total = 7;
+  for (let i = 1; i <= total; i++) {
+    await sleep(400);
+    await driver.saveScreenshot(`level-up-${i}.png`);
+  }
+  return await checkIsGoodLevelUp(total, required);
+}
+
+
+module.exports = { checkIsGoodLevelUp, statSummary, checkGoodCondition, checkIsLevelUp, findColor, extractLevelUpPanel, checkLevelUpgrade }
+
+const func = async () => {
+  console.log(checkGoodCondition({
+    count: 5,
+    2: 1,
+    3: 1,
+    4: 0,
+    5: 1,
+    6: 0,
+    7: 1,
+    8: 1,
+    9: 0,
+  }, goodCondition));
+}
+func();
 

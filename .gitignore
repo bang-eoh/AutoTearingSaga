@@ -1,4 +1,7 @@
 node_modules/
-level-up-*.png
-SLPS-03177_0.sav
+*level-up-*.png
+*level-up-*.jpg
+xxx*-*.jpg
 test/specs/levelup.js
+current*.png
+current-crop*.jpg

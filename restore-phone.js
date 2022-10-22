@@ -1,8 +1,10 @@
 const { exec } = require("child_process");
-exec('adb -s emulator-5554 pull storage/self/primary/duckstation/savestates/SLPS-03177_0.sav', (err, stdout, stderr) => {
-  console.log(err)
-  exec('adb -s R3CN203BDKN push SLPS-03177_0.sav storage/self/primary/duckstation/savestates/SLPS-03177_0.sav', (err, stdout, stderr) => {
-    console.log(err)
-    console.log('Sync from emulator to phone');
+exec('adb -s emulator-5554 pull storage/self/primary/duckstation/savestates/SLPS-03177_0.sav', (err1, stdout, stderr) => {
+  exec('adb -s R3CN203BDKN push SLPS-03177_0.sav storage/self/primary/duckstation/savestates/SLPS-03177_0.sav', (err2, stdout, stderr) => {
+    if (err1 || err2) {
+      console.log(err1, err2)
+    } else {
+      console.log('Sync from emulator to phone');
+    }
   })
 })
