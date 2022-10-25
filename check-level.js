@@ -218,6 +218,9 @@ const isGoodCondition = (isGood, required) => {
   }
 
   for (const k in required) { // equal expect
+    if (required[k] === -1 && isGood[k]) {
+      return false;
+    }
     if (required[k] && !isGood[k]) {
       return false;
     }
