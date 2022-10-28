@@ -1,3 +1,4 @@
+const { isArenaConfirm } = require('../../check-arena');
 const { checkLevelUpgrade} = require('../../check-level');
 const PlayingPage = require('../pageobjects/playing.page');
 const { sleep } = require('./common');
@@ -9,7 +10,7 @@ describe('Run auto', () => {
   })
 
   it('level up', async () => {
-    let steps = `
+    let reset = `
     X
     O
     O
@@ -22,14 +23,8 @@ describe('Run auto', () => {
     wait
     wait
     O
-    O
-    O
-    O
-    O
-    O
-    O
-    O
-    save
+    `
+    let steps = `
     right
     O
     O
@@ -42,19 +37,48 @@ describe('Run auto', () => {
     O
     wait-level-up
   `;
-    steps = steps.split('\n').map((x) => {
-      x = x.trim();
-      if (!x.length) {
-        return null;
-      }
-      return x;
-    }).filter((x) => x);
+
+  reset = reset.split('\n').map((x) => {
+    x = x.trim();
+    if (!x.length) {
+      return null;
+    }
+    return x;
+  }).filter((x) => x);
+  
+  steps = steps.split('\n').map((x) => {
+    x = x.trim();
+    if (!x.length) {
+      return null;
+    }
+    return x;
+  }).filter((x) => x);
+
     
     while (true) {
       await PlayingPage.reload();
       await sleep(2000);
+      for (let i = 0; i < reset.length; i++) {
+        await PlayingPage.perform(reset[i]);
+      }
+
+      let isAtArenaConfirm = false;
+      for (let i = 0; i < 30; i++) {
+        await PlayingPage.perform('O');
+        await driver.saveScreenshot('current.png');
+        if (await isArenaConfirm('current.png')) {
+          isAtArenaConfirm = true;
+          break;
+        }
+      }
+
+      if (isAtArenaConfirm) {
+        await PlayingPage.perform('save');
+      } else {
+        continue;
+      }
+
       for (let i = 0; i < steps.length; i++) {
-        console.log({ step: steps[i] })
         await PlayingPage.perform(steps[i]);
       }
       const isGood = await checkLevelUpgrade(goodCondition);
