@@ -248,6 +248,9 @@ const checkLevelUpgrade = async (required) => {
     await driver.saveScreenshot(`level-up-${i}.png`);
   }
   const good = await checkIsGoodLevelUp(total, required);
+  if (good) {
+    console.error('Goooooooooooooodddddddddddddddddd')
+  }
   if (good && syncGithub) {
     exec('adb -s emulator-5554 pull storage/self/primary/duckstation/savestates/SLPS-03177_0.sav', (err1, stdout, stderr) => {
       exec('git add .', (err1, stdout, stderr) => {
