@@ -64,7 +64,7 @@ describe('Run auto', () => {
 
       let isAtArenaConfirm = false;
       for (let i = 0; i < 30; i++) {
-        await PlayingPage.perform('O');
+        await PlayingPage.perform('2O');
         await driver.saveScreenshot('current.png');
         if (await isArenaConfirm('current.png')) {
           isAtArenaConfirm = true;

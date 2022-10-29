@@ -180,6 +180,12 @@ class PlayingPage extends Page {
           await this.pressO();
           await sleep(1000);
           break;
+        case '2O':
+          await this.pressO();
+          await sleep(200);
+          await this.pressO();
+          await sleep(200);
+          break;
         case 'square':
           await this.pressSquare();
           await sleep(500);
