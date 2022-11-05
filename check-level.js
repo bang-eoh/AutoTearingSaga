@@ -221,7 +221,7 @@ const isGoodCondition = (isGood, required) => {
     if (required[k] === -1 && isGood[k]) {
       return false;
     }
-    if (required[k] && !isGood[k]) {
+    if (required[k] === 1 && !isGood[k]) {
       return false;
     }
   }
@@ -252,7 +252,7 @@ const checkLevelUpgrade = async (required) => {
     console.error('Goooooooooooooodddddddddddddddddd')
   }
   if (good && syncGithub) {
-    exec('adb -s emulator-5554 pull storage/self/primary/duckstation/savestates/SLPS-03177_0.sav', (err1, stdout, stderr) => {
+    exec('adb -s emulator-5554 pull storage/self/primary/duckstation/savestates/SLPS-03177_1.sav SLPS-03177_0.sav', (err1, stdout, stderr) => {
       exec('git add .', (err1, stdout, stderr) => {
         exec('git cm -m "update save file"', (err1, stdout, stderr) => {
           exec('git push', (err1, stdout, stderr) => {

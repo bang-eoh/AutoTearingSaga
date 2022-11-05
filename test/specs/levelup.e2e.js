@@ -17,7 +17,6 @@ describe('Run auto', () => {
     ${fight}
     confirm
     ${isBoss ? 'boss' : 'finish'}
-    wait-level-up
   `;
     steps = steps.split('\n').map((x) => {
       x = x.trim();
@@ -34,6 +33,10 @@ describe('Run auto', () => {
         console.log({ step: steps[i] })
         await PlayingPage.perform(steps[i]);
       }
+      
+      await PlayingPage.perform('wait-level-up');
+      await PlayingPage.perform('save1');
+      
       const isGood = await checkLevelUpgrade(goodCondition);
 
       if (isGood) {

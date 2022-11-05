@@ -48,6 +48,10 @@ class PlayingPage extends Page {
     return $('/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/androidx.appcompat.widget.LinearLayoutCompat/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.RelativeLayout[1]')
   }
 
+  get buttonSaveSlot1 () {
+    return $('/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/androidx.appcompat.widget.LinearLayoutCompat/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.RelativeLayout[2]')
+  }
+
   async moveUp() {
     await this.pad.touchAction({action: 'tap', x: 168, y:30});
   }
@@ -105,10 +109,14 @@ class PlayingPage extends Page {
     sleep(500)
   }
 
-  async quicksave() {
+  async quicksave(index = 0) {
     this.buttonPause.touchAction({action: 'tap', x: 10, y:10});
     this.buttonSaveState.touchAction({action: 'tap', x: 10, y:10});
-    this.buttonQuickSave.touchAction({action: 'tap', x: 10, y:10});
+    if (index === 0) {
+      this.buttonQuickSave.touchAction({action: 'tap', x: 10, y:10});
+    } else if (index === 1) {
+      this.buttonSaveSlot1.touchAction({action: 'tap', x: 10, y:10});
+    }
     sleep(500)
   }
 
@@ -184,7 +192,7 @@ class PlayingPage extends Page {
           await this.pressO();
           await sleep(200);
           await this.pressO();
-          await sleep(200);
+          await sleep(500);
           break;
         case 'square':
           await this.pressSquare();
@@ -196,6 +204,10 @@ class PlayingPage extends Page {
           break;
         case 'save':
           await this.quicksave()
+          await sleep(1000);
+          break;
+        case 'save1':
+          await this.quicksave(1)
           await sleep(1000);
           break;
         case 'up-left':

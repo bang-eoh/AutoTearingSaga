@@ -21,8 +21,9 @@ describe('Run auto', () => {
     O
     wait
     wait
-    wait
-    O
+    2O
+    2O
+    2O
     `
     let steps = `
     right
@@ -35,7 +36,6 @@ describe('Run auto', () => {
     O
     O
     O
-    wait-level-up
   `;
 
   reset = reset.split('\n').map((x) => {
@@ -81,6 +81,9 @@ describe('Run auto', () => {
       for (let i = 0; i < steps.length; i++) {
         await PlayingPage.perform(steps[i]);
       }
+      
+      await PlayingPage.perform('wait-level-up');
+      await PlayingPage.perform('save1');
       const isGood = await checkLevelUpgrade(goodCondition);
 
       if (isGood) {
